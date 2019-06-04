@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 /****
   Basic hash table key/value pair
  ****/
-typedef struct Pair {
+typedef struct Pair
+{
   char *key;
   char *value;
 } Pair;
@@ -14,7 +14,8 @@ typedef struct Pair {
 /****
   Basic hash table
  ****/
-typedef struct BasicHashTable {
+typedef struct BasicHashTable
+{
   int capacity;
   Pair **storage;
 } BasicHashTable;
@@ -36,7 +37,8 @@ Pair *create_pair(char *key, char *value)
  ****/
 void destroy_pair(Pair *pair)
 {
-  if (pair != NULL) {
+  if (pair != NULL)
+  {
     free(pair->key);
     free(pair->value);
     free(pair);
@@ -52,25 +54,27 @@ unsigned int hash(char *str, int max)
 {
   unsigned long hash = 5381;
   int c;
-  unsigned char * u_str = (unsigned char *)str;
+  unsigned char *u_str = (unsigned char *)str;
 
-  while ((c = *u_str++)) {
+  while ((c = *u_str++))
+  {
     hash = ((hash << 5) + hash) + c;
   }
 
   return hash % max;
 }
 
-
 /****
   Fill this in.
 
   All values in storage should be initialized to NULL
-  (hint: look up `calloc`)
+  (hint: look up `calloc`) calloc sets initialized memory to 0
  ****/
 BasicHashTable *create_hash_table(int capacity)
 {
-  BasicHashTable *ht;
+  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+  ht->capacity = capacity;
+  ht->storage = calloc(capacity, (sizeof(char *)));
 
   return ht;
 }
@@ -84,7 +88,19 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-
+  // hash incoming value to get index
+  int hashed_index = hash(key, 16);
+  // if hashed index is occupied, override current pair and print warning
+  if (ht->storage[hashed_index] != NULL)
+  {
+    destroy_pair(ht->storage[hashed_index]);
+    ht->storage[hashed_index] = create_pair(key, value);
+    printf("Value overridden at index: %d\n", hashed_index);
+  }
+  else
+  {
+    ht->storage[hashed_index] = create_pair(key, value);
+  }
 }
 
 /****
@@ -94,7 +110,11 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  int hashed_index = hash(key, 16);
 
+  destroy_pair(ht->storage[hashed_index]);
+
+  ht->storage[hashed_index] = NULL;
 }
 
 /****
@@ -104,6 +124,13 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
+  int hashed_index = hash(key, 16);
+
+  if (ht->storage[hashed_index])
+  {
+    return ht->storage[hashed_index]->value;
+  }
+
   return NULL;
 }
 
@@ -114,9 +141,17 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
-
+  // for each pair in storage, delete_pair
+  for (int i = 0; i < ht->capacity - 1; i++)
+  {
+    if (ht->storage[i])
+    {
+      destroy_pair(ht->storage[i]);
+    }
+  }
+  free(ht->storage);
+  free(ht);
 }
-
 
 #ifndef TESTING
 int main(void)
@@ -129,9 +164,12 @@ int main(void)
 
   hash_table_remove(ht, "line");
 
-  if (hash_table_retrieve(ht, "line") == NULL) {
+  if (hash_table_retrieve(ht, "line") == NULL)
+  {
     printf("...gone tomorrow. (success)\n");
-  } else {
+  }
+  else
+  {
     fprintf(stderr, "ERROR: STILL HERE\n");
   }
 
