@@ -96,6 +96,39 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
+  // hash incoming key to get index
+  int h_i = hash(key, ht->capacity);
+
+  // if hashed index is open - insert linked pair
+  if (ht->storage[h_i] == NULL)
+  {
+    ht->storage[h_i] = create_pair(key, value);
+  }
+  // if hashed index is not open
+  else
+  {
+    LinkedPair *current_node = ht->storage[h_i];
+
+    while (current_node->next != NULL)
+    {
+      //check if key exists in linked list and override value
+      if (strcmp(current_node->key, key) == 0)
+      {
+        current_node->value = value;
+        break;
+      }
+      current_node = current_node->next;
+    }
+
+    if (strcmp(current_node->key, key) == 0)
+    {
+      current_node->value = value;
+    }
+    else
+    {
+      current_node->next = create_pair(key, value);
+    }
+  }
 }
 
 /*
@@ -155,6 +188,7 @@ int main(void)
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+  hash_table_insert(ht, "line_3", "Testing my function to change value\n");
 
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
