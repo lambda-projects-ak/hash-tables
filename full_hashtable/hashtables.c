@@ -96,38 +96,32 @@ HashTable *create_hash_table(int capacity)
  */
 void hash_table_insert(HashTable *ht, char *key, char *value)
 {
-  // hash incoming key to get index
   int h_i = hash(key, ht->capacity);
 
-  // if hashed index is open - insert linked pair
+  // if index is open - create new node
   if (ht->storage[h_i] == NULL)
-  {
     ht->storage[h_i] = create_pair(key, value);
-  }
+
   // if hashed index is not open
   else
   {
-    LinkedPair *current_node = ht->storage[h_i];
-
-    while (current_node->next != NULL)
+    LinkedPair *node = ht->storage[h_i];
+    // scan nodes for matching key
+    while (node->next != NULL)
     {
-      //check if key exists in linked list and override value
-      if (strcmp(current_node->key, key) == 0)
+      if (strcmp(node->key, key) == 0)
       {
-        current_node->value = value;
+        node->value = value;
         break;
       }
-      current_node = current_node->next;
+      node = node->next;
     }
 
-    if (strcmp(current_node->key, key) == 0)
-    {
-      current_node->value = value;
-    }
+    // last node
+    if (strcmp(node->key, key) == 0)
+      node->value = value;
     else
-    {
-      current_node->next = create_pair(key, value);
-    }
+      node->next = create_pair(key, value);
   }
 }
 
@@ -141,6 +135,17 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // find hash of key
+  int h_i = hash(key, ht->capacity);
+  LinkedPair *node = ht->storage[h_i];
+  // check index for match
+  if (node)
+  {
+  }
+  // create temp node
+  // remove node
+  // point previous nodes next to temp nodes next
+  // free temp nodes memory
 }
 
 /*
