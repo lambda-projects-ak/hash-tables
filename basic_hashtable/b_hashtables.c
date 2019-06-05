@@ -74,7 +74,7 @@ BasicHashTable *create_hash_table(int capacity)
 {
   BasicHashTable *ht = malloc(sizeof(BasicHashTable));
   ht->capacity = capacity;
-  ht->storage = calloc(capacity, sizeof(Pair *));
+  ht->storage = calloc(capacity, (sizeof(Pair *)));
 
   return ht;
 }
@@ -88,7 +88,7 @@ BasicHashTable *create_hash_table(int capacity)
  ****/
 void hash_table_insert(BasicHashTable *ht, char *key, char *value)
 {
-  // hash incoming value to get index
+  // hash incoming value to get inde
   int hashed_index = hash(key, ht->capacity);
   // if hashed index is occupied, override current pair and print warning
   if (ht->storage[hashed_index] != NULL)
@@ -110,7 +110,7 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
-  int hashed_index = hash(key, 16);
+  int hashed_index = hash(key, ht->capacity);
 
   destroy_pair(ht->storage[hashed_index]);
 
@@ -124,7 +124,7 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  int hashed_index = hash(key, 16);
+  int hashed_index = hash(key, ht->capacity);
 
   if (ht->storage[hashed_index])
   {
