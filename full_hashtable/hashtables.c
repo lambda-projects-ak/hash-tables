@@ -247,17 +247,16 @@ HashTable *hash_table_resize(HashTable *ht)
   {
     LinkedPair *node = ht->storage[i];
 
-    if (node)
+    while (node->next)
     {
-      while (node->next)
-      {
-        int new_i = hash(node->key, new_ht->capacity);
-        new_ht->storage[new_i] = node;
-        node = node->next;
-      }
       int new_i = hash(node->key, new_ht->capacity);
       new_ht->storage[new_i] = node;
+      node = node->next;
     }
+    // account for last node
+    int new_i = hash(node->key, new_ht->capacity);
+    new_ht->storage[new_i] = node;
+
     // increment to next bucket
   }
 
