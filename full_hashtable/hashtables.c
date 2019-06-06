@@ -246,14 +246,19 @@ HashTable *hash_table_resize(HashTable *ht)
   for (int i = 0; i < ht->capacity; i++)
   {
     LinkedPair *node = ht->storage[i];
-    printf("%s\n", node->key);
 
     if (node)
     {
+      while (node->next)
+      {
+        int new_i = hash(node->key, new_ht->capacity);
+        new_ht->storage[new_i] = node;
+        node = node->next;
+      }
       int new_i = hash(node->key, new_ht->capacity);
       new_ht->storage[new_i] = node;
     }
-    // move to next index
+    // increment to next bucket
   }
 
   free(ht->storage);
