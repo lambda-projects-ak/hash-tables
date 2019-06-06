@@ -40,7 +40,7 @@ char *test_hash_table_insertion_and_retrieval()
     return_value = hash_table_retrieve(ht, "key-9");
     mu_assert(strcmp(return_value, "val-9") == 0, "Value is not stored correctly");
 
-    return NULL; 
+    return NULL;
 }
 
 char *test_hash_table_insertion_overwrites_correctly()
@@ -80,7 +80,7 @@ char *test_hash_table_insertion_overwrites_correctly()
     mu_assert(strcmp(hash_table_retrieve(ht, "key-8"), "new-val-8") == 0, "Value is not overwritten correctly");
     mu_assert(strcmp(hash_table_retrieve(ht, "key-9"), "new-val-9") == 0, "Value is not overwritten correctly");
 
-    return NULL; 
+    return NULL;
 }
 
 char *test_hash_table_removes_correctly()
@@ -123,7 +123,8 @@ char *test_hash_table_removes_correctly()
     return NULL;
 }
 
-char *hash_table_resizing_test() {
+char *hash_table_resizing_test()
+{
     struct HashTable *ht = create_hash_table(8);
 
     hash_table_insert(ht, "resize-key-0", "resize-val-0");

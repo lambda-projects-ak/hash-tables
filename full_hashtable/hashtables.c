@@ -107,7 +107,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   {
     LinkedPair *node = ht->storage[h_i];
     // scan nodes for matching key
-    while (node->next != NULL)
+    while (node->next)
     {
       if (strcmp(node->key, key) == 0)
       {
@@ -135,14 +135,13 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
-
   int h_i = hash(key, ht->capacity);
   LinkedPair *node = ht->storage[h_i];
 
   // accounts for first node match
   while (strcmp(node->key, key) == 0)
   {
-    if (node->next == NULL)
+    if (!node->next)
     {
       destroy_pair(node);
       ht->storage[h_i] = NULL;
@@ -150,35 +149,26 @@ void hash_table_remove(HashTable *ht, char *key)
     }
     else
     {
-      LinkedPair *temp = node;
-      node = node->next;
-      destroy_pair(temp);
+      ht->storage[h_i] = node->next;
+      destroy_pair(node);
     }
   }
 
   // check index for match
-  if (ht->storage[h_i])
+  while (node->next)
   {
-    while (node->next != NULL)
-    {
-      LinkedPair *next_node = node->next;
-      if (strcmp(next_node->key, key) == 0)
-      {
-        // match found
-        node->next = next_node->next;
-        destroy_pair(next_node);
-      }
-      else
-        node = node->next;
-    }
-    // last node
     if (strcmp(node->next->key, key) == 0)
     {
-      // match found
+      // match found, bypass current nodes next and destroy
+      node->next = node->next->next;
       destroy_pair(node->next);
-      node->next = NULL;
     }
+    else
+      node = node->next;
   }
+  // last node
+  if (strcmp(node->key, key) == 0)
+    destroy_pair(node);
 }
 
 /*
@@ -194,18 +184,25 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   int h_i = hash(key, ht->capacity);
   LinkedPair *node = ht->storage[h_i];
 
-  while (node->next != NULL)
+  if (node)
   {
     if (strcmp(node->key, key) == 0)
       return node->value;
     else
-      node = node->next;
+    {
+      while (node->next)
+      {
+        if (strcmp(node->key, key) == 0)
+          return node->value;
+        else
+          node = node->next;
+      }
+      // account for last node
+      if (strcmp(node->key, key) == 0)
+        return node->value;
+    }
   }
-
-  if (strcmp(node->key, key) == 0)
-    return node->value;
-  else
-    return NULL;
+  return NULL;
 }
 
 /*
@@ -218,9 +215,10 @@ void destroy_hash_table(HashTable *ht)
   for (int i = 0; i < ht->capacity; i++)
   {
     LinkedPair *node = ht->storage[i];
+
     if (node)
     {
-      while (node->next != NULL)
+      while (node->next)
       {
         LinkedPair *temp = node;
         node = node->next;
@@ -248,11 +246,14 @@ HashTable *hash_table_resize(HashTable *ht)
   for (int i = 0; i < ht->capacity; i++)
   {
     LinkedPair *node = ht->storage[i];
-    if (node != NULL)
+    printf("%s\n", node->key);
+
+    if (node)
     {
       int new_i = hash(node->key, new_ht->capacity);
       new_ht->storage[new_i] = node;
     }
+    // move to next index
   }
 
   free(ht->storage);
