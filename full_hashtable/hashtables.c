@@ -194,13 +194,18 @@ char *hash_table_retrieve(HashTable *ht, char *key)
   int h_i = hash(key, ht->capacity);
   LinkedPair *node = ht->storage[h_i];
 
-  while (strcmp(node->key, key) != 0)
+  while (node->next != NULL)
   {
     if (strcmp(node->key, key) == 0)
-      return node->key;
+      return node->value;
+    else
+      node = node->next;
   }
 
-  return NULL;
+  if (strcmp(node->key, key) == 0)
+    return node->value;
+  else
+    return NULL;
 }
 
 /*
@@ -236,12 +241,12 @@ void destroy_hash_table(HashTable *ht)
 
   Don't forget to free any malloc'ed memory!
  */
-HashTable *hash_table_resize(HashTable *ht)
-{
-  HashTable *new_ht = create_hash_table(ht->capacity * 2);
+// HashTable *hash_table_resize(HashTable *ht)
+// {
+//   HashTable *new_ht = create_hash_table(ht->capacity * 2);
 
-  return new_ht;
-}
+//   return new_ht;
+// }
 
 #ifndef TESTING
 int main(void)
@@ -251,19 +256,18 @@ int main(void)
   hash_table_insert(ht, "line_1", "Tiny hash table\n");
   hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
   hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
-  hash_table_insert(ht, "line_3", "Testing my function to change value\n");
 
   printf("%s", hash_table_retrieve(ht, "line_1"));
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  int old_capacity = ht->capacity;
-  ht = hash_table_resize(ht);
-  int new_capacity = ht->capacity;
+  // int old_capacity = ht->capacity;
+  // ht = hash_table_resize(ht);
+  // int new_capacity = ht->capacity;
 
-  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  destroy_hash_table(ht);
+  // destroy_hash_table(ht);
 
   return 0;
 }
