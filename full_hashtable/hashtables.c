@@ -241,12 +241,24 @@ void destroy_hash_table(HashTable *ht)
 
   Don't forget to free any malloc'ed memory!
  */
-// HashTable *hash_table_resize(HashTable *ht)
-// {
-//   HashTable *new_ht = create_hash_table(ht->capacity * 2);
+HashTable *hash_table_resize(HashTable *ht)
+{
+  HashTable *new_ht = create_hash_table(ht->capacity * 2);
 
-//   return new_ht;
-// }
+  for (int i = 0; i < ht->capacity; i++)
+  {
+    LinkedPair *node = ht->storage[i];
+    if (node != NULL)
+    {
+      int new_i = hash(node->key, new_ht->capacity);
+      new_ht->storage[new_i] = node;
+    }
+  }
+
+  free(ht->storage);
+  free(ht);
+  return new_ht;
+}
 
 #ifndef TESTING
 int main(void)
@@ -261,13 +273,13 @@ int main(void)
   printf("%s", hash_table_retrieve(ht, "line_2"));
   printf("%s", hash_table_retrieve(ht, "line_3"));
 
-  // int old_capacity = ht->capacity;
-  // ht = hash_table_resize(ht);
-  // int new_capacity = ht->capacity;
+  int old_capacity = ht->capacity;
+  ht = hash_table_resize(ht);
+  int new_capacity = ht->capacity;
 
-  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-  // destroy_hash_table(ht);
+  destroy_hash_table(ht);
 
   return 0;
 }
